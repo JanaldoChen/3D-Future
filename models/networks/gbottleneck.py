@@ -11,7 +11,7 @@ class GResBlock(nn.Module):
 
         self.conv1 = GConv(in_features=in_dim, out_features=hidden_dim, adj_mat=adj_mat)
         self.conv2 = GConv(in_features=hidden_dim, out_features=in_dim, adj_mat=adj_mat)
-        self.activation = F.relu if activation else None
+        self.activation = activation
 
     def forward(self, inputs):
         x = self.conv1(inputs)
