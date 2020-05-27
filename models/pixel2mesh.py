@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from backbone.resnet import resnet18
 from networks.gbottleneck import GBottleneck
 from networks.graph_unpooling import GraphUnpooling
 from networks.graph_projection import GraphProjection
@@ -14,7 +15,7 @@ class Pixel2Mesh(nn.Module):
         self.coord_dim = coord_dim
 
         # Encoder
-        self.encoder = get_backbone()
+        self.encoder = resnet18(pretrained=True)
 
         # Save necessary helper matrices in respective variables
         self.initial_coordinates = nn.Parameter(torch.tensor(ellipsoid[0]), requires_grad=False)
@@ -87,6 +88,10 @@ class Pixel2Mesh(nn.Module):
         x = self.unpooling[0](torch.cat([x, x_hidden], dim=2))
         x3, _ = self.gcns[2](x)
 
-        return {'pred_coord': [x1, x2, x3], 'pred_coord_before_deform': [init_pts, x1_up, x2_up]}
+        out = {
+            'pred_coord': [x1, x2, x3],
+            'pred_coord_before_deform': [init_pts, x1_up, x2_up]
+        }
+        return out
 
 
