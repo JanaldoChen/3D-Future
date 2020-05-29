@@ -13,6 +13,13 @@ class P2MLoss(nn.Module):
         self.laplace_idx = nn.ParameterList([nn.Parameter(idx, requires_grad=False) for idx in ellipsoid.laplace_idx])
         self.edges = nn.ParameterList([nn.Parameter(edges, requires_grad=False) for edges in ellipsoid.edges])
 
+        self.lambda_chamfer = 1.
+        self.lambda_chamfer_opposite = 1.
+        self.lambda_laplace = 0.5
+        self.lambda_move = 0.1
+        self.lambda_edge = 0.3
+        self.lambda_normal = 1.6e-4
+
     def edge_regularization(self, pred, edges):
         """
         :param pred: batch_size * num_points * 3
@@ -76,16 +83,12 @@ class P2MLoss(nn.Module):
         chamfer_loss, edge_loss, normal_loss, lap_loss, move_loss = 0., 0., 0., 0., 0.
         lap_const = [0.2, 1., 1.]
 
-        gt_coord, gt_normal, gt_images = targets["points"], targets["normals"], targets["images"]
+        gt_coord, gt_normal = targets["points"], targets["normals"]
         pred_coord, pred_coord_before_deform = outputs["pred_coord"], outputs["pred_coord_before_deform"]
-        image_loss = 0.
-        if outputs["reconst"] is not None and self.options.weights.reconst != 0:
-            image_loss = self.image_loss(gt_images, outputs["reconst"])
 
         for i in range(3):
             dist1, dist2, idx1, idx2 = self.chamfer_dist(gt_coord, pred_coord[i])
-            chamfer_loss += self.options.weights.chamfer[i] * (torch.mean(dist1) +
-                                                               self.options.weights.chamfer_opposite * torch.mean(dist2))
+            chamfer_loss += torch.mean(dist1) + self.lambda_chamfer_opposite * torch.mean(dist2)
             normal_loss += self.normal_loss(gt_normal, idx2, pred_coord[i], self.edges[i])
             edge_loss += self.edge_regularization(pred_coord[i], self.edges[i])
             lap, move = self.laplace_regularization(pred_coord_before_deform[i],
@@ -93,13 +96,11 @@ class P2MLoss(nn.Module):
             lap_loss += lap_const[i] * lap
             move_loss += lap_const[i] * move
 
-        loss = chamfer_loss + image_loss * self.options.weights.reconst + \
-               self.options.weights.laplace * lap_loss + \
-               self.options.weights.move * move_loss + \
-               self.options.weights.edge * edge_loss + \
-               self.options.weights.normal * normal_loss
-
-        loss = loss * self.options.weights.constant
+        loss = self.lambda_chamfer * chamfer_loss + \
+               self.lambda_laplace * lap_loss + \
+               self.lambda_move * move_loss + \
+               self.lambda_edge * edge_loss + \
+               self.lambda_normal * normal_loss
 
         return loss, {
             "loss": loss,

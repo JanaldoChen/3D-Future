@@ -6,6 +6,8 @@ from PIL import Image
 from torchvision import transforms
 from torch.utils.data.dataset import Dataset
 
+from utils.util import load_obj, load_pickle_file
+
 class Future3D_Reconstruction_Dataset(Dataset):
     def __init__(self, data_root, train_set_json='train_set.json', image_size=224, transform=None):
         self.data_root = data_root
@@ -28,12 +30,14 @@ class Future3D_Reconstruction_Dataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
             mask = self.transform(mask)
-            
+        vns_dict = load_pickle_file(os.path.join(self.data_root, 'verts_normals', item_info['model']+'.pklcd '))
+        verts = vns_dict['verts']
+        normals = vns_dict['normals']
         output = {
             'image': img,
             'mask': mask,
-            'model': item_info['model'],
-            'texture': item_info['texture'],
+            'vertices': torch.from_numpy(verts).float(),
+            'normals': torch.from_numpy(normals).float(), 
             'translation': torch.tensor(item_info['pose']['translation']).float(),
             'rotation': torch.tensor(item_info['pose']['rotation']).float(),
             'fov': torch.tensor(item_info['fov']).float()

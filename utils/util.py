@@ -42,6 +42,8 @@ def load_obj(obj_file):
         for line in fp:
             line = line.rstrip()
             line_splits = line.split()
+            if len(line_splits) == 0:
+                continue
             prefix = line_splits[0]
 
             if prefix == 'v':
@@ -68,7 +70,7 @@ def load_obj(obj_file):
                 faces_vns.append(np.array(f_vn, dtype=np.int32) - 1)
 
             else:
-                raise ValueError(prefix)
+                #raise ValueError(prefix)
                 continue
 
         obj_dict = {

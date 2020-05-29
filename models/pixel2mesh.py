@@ -47,14 +47,14 @@ class Pixel2Mesh(nn.Module):
 
         self.projection = GraphProjection()
 
-    def forward(self, img, cam):
+    def forward(self, img, camera_mat):
         batch_size = img.size(0)
         img_feat = self.encoder(img)
 
         init_pts = self.initial_coordinates.data.unsqueeze(0).expand(batch_size, -1, -1)
         
         # GCN Block 1
-        x = self.projection(init_pts, img_feat, cam)
+        x = self.projection(init_pts, img_feat, camera_mat)
         x1, x_hidden = self.gcns[0](x)
 
         x1_up = self.unpooling[0](x1)
