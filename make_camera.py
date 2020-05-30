@@ -14,13 +14,13 @@ if __name__ == '__main__':
         train_set_info = json.load(f)
     total = len(train_set_info)
     for i in range(total):
-        model_ID = train_set_info[i]['model']
-        trans = train_set_info[i]['pose']['translation']
-        rot = train_set_info[i]['pose']['rotation']
-        fov = train_set_info[i]['fov']
-        clear_scene()
-        clear_mv()
         try:
+            model_ID = train_set_info[i]['model']
+            trans = np.array(train_set_info[i]['pose']['translation'])
+            rot = np.array(train_set_info[i]['pose']['rotation'])
+            fov = math.radians(train_set_info[i]['fov'])
+            clear_scene()
+            clear_mv()
             cam = add_camera((0, 0, 0), fov, 'camera')
             K_blender = get_calibration_matrix_K_from_blender(cam.data)
             K = np.array(K_blender)

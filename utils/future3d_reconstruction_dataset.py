@@ -33,6 +33,8 @@ class Future3D_Reconstruction_Dataset(Dataset):
         vns_dict = load_pickle_file(os.path.join(self.data_root, 'verts_normals', item_info['model']+'.pkl'))
         verts = vns_dict['verts']
         normals = vns_dict['normals']
+        camera_dict = load_pickle_file(os.path.join(self.data_root, 'cameras', item_info['model']+'.pkl'))
+        K = camera_dict['K']
         output = {
             'image': img,
             'mask': mask,
@@ -40,7 +42,7 @@ class Future3D_Reconstruction_Dataset(Dataset):
             'normals': torch.from_numpy(normals).float(), 
             'translation': torch.tensor(item_info['pose']['translation']).float(),
             'rotation': torch.tensor(item_info['pose']['rotation']).float(),
-            'fov': torch.tensor(item_info['fov']).float()
+            'K': torch.from_numpy(K).float()
         }
         
         return output
