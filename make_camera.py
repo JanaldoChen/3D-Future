@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import math
 import json
 import numpy as np
 
@@ -14,10 +15,10 @@ if __name__ == '__main__':
         train_set_info = json.load(f)
     total = len(train_set_info)
     for i in range(total):
+        model_ID = train_set_info[i]['model']
+        trans = np.array(train_set_info[i]['pose']['translation'])
+        rot = np.array(train_set_info[i]['pose']['rotation'])
         try:
-            model_ID = train_set_info[i]['model']
-            trans = np.array(train_set_info[i]['pose']['translation'])
-            rot = np.array(train_set_info[i]['pose']['rotation'])
             fov = math.radians(train_set_info[i]['fov'])
             clear_scene()
             clear_mv()
