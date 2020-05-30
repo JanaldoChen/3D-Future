@@ -11,7 +11,7 @@ if __name__ == '__main__':
 	data_root = '../data/Future-3D-Reconstruction'
 	camera_dir = os.path.join(data_root, 'train', 'cameras')
 
-    with open(os.path.join(data_root, 'data_info', train_set_json)) as f:
+    with open(os.path.join(data_root, 'train', 'train_set.json')) as f:
         train_set_info = json.load(f)
     
     for i in range(len(train_set_info)):
