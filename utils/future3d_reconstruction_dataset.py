@@ -18,7 +18,7 @@ class Future3D_Reconstruction_Dataset(Dataset):
         
         if self.transform is None:
             self.transform = transforms.Compose([
-                transforms.Resize((image_size, image_size)),
+                #transforms.Resize((image_size, image_size)),
                 transforms.ToTensor()
             ])
 

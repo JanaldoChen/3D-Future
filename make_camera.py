@@ -3,15 +3,17 @@ import sys
 import time
 import math
 import json
+import bpy
 import numpy as np
+from PIL import Image
 
 from utils.util import write_pickle_file
 from utils.blender_utils import clear_mv, clear_scene, add_camera, get_calibration_matrix_K_from_blender
 
-def init_blender():
+def init_blender(size):
     scene = bpy.context.scene
-    scene.render.resolution_x = 1200
-    scene.render.resolution_y = 1200
+    scene.render.resolution_x = size[0]
+    scene.render.resolution_y = size[1]
     scene.render.resolution_percentage = 100
 
     # Delete default cube
@@ -27,11 +29,13 @@ if __name__ == '__main__':
     total = len(train_set_info)
     for i in range(total):
         model_ID = train_set_info[i]['model']
+        img = Image.open(os.path.join(data_root, 'train', 'image', train_set_info[i]['image'])).convert('RGB')
         trans = np.array(train_set_info[i]['pose']['translation'])
         rot = np.array(train_set_info[i]['pose']['rotation'])
+        init_blender(img.size)
         try:
-            init_blender()
-            fov = math.radians(train_set_info[i]['fov'])
+            #fov = math.radians(train_set_info[i]['fov'])
+            fov = train_set_info[i]['fov']
             cam = add_camera((0, 0, 0), fov, 'camera')
             K_blender = get_calibration_matrix_K_from_blender(cam.data)
             K = np.array(K_blender)

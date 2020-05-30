@@ -76,9 +76,11 @@ def generate_normal(pt_position, face_pts, face_axis):
 	return pt_position, pt_normal
 
 if __name__ == '__main__':
-	data_root = '../data/Future-3D-Reconstruction'
+	data_root = 'data/Future-3D-Reconstruction'
 	model_dir = os.path.join(data_root, 'train', 'model')
 	verts_normals_dir = os.path.join(data_root, 'train', 'verts_normals')
+	if not os.path.exists(verts_normals_dir):
+		os.mkdir(verts_normals_dir)
 
 	model_IDs = os.listdir(model_dir)
 	model_IDs = [ID for ID in model_IDs if ID[-4:] == '.obj']
