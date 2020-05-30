@@ -30,7 +30,7 @@ class Future3D_Reconstruction_Dataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
             mask = self.transform(mask)
-        vns_dict = load_pickle_file(os.path.join(self.data_root, 'verts_normals', item_info['model']+'.pklcd '))
+        vns_dict = load_pickle_file(os.path.join(self.data_root, 'verts_normals', item_info['model']+'.pkl'))
         verts = vns_dict['verts']
         normals = vns_dict['normals']
         output = {
